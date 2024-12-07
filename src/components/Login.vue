@@ -1,67 +1,41 @@
 <template>
-  <div class="login">
+  <div>
     <h1>Login</h1>
-    <form @submit.prevent="handleLogin">
-      <div>
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="credentials.email"
-          placeholder="Enter your email"
-        />
-      </div>
-      <div>
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          v-model="credentials.password"
-          placeholder="Enter your password"
-        />
-      </div>
+    <form @submit.prevent="loginUser">
+      <label>Email:</label>
+      <input v-model="email" type="email" required />
+      <label>Password:</label>
+      <input v-model="password" type="password" required />
       <button type="submit">Login</button>
     </form>
-    <p v-if="error" class="error">{{ error }}</p>
   </div>
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from "../stores/auth";
+import { useRouter } from "vue-router";
 
 export default {
-  data() {
-    return {
-      credentials: {
-        email: '',
-        password: '',
-      },
-      error: '',
-    };
-  },
   setup() {
     const authStore = useAuthStore();
+    const router = useRouter();
+    const email = ref("");
+    const password = ref("");
 
-    const handleLogin = async () => {
+    const loginUser = async () => {
       try {
-        await authStore.login(this.credentials);
-        this.$router.push('/todos'); // Redirect to Todos page on successful login
-      } catch (err) {
-        this.error = 'Invalid email or password.';
+        await authStore.login(email.value, password.value);
+        router.push("/todos");
+      } catch (error) {
+        alert("Invalid login credentials");
       }
     };
 
-    return { handleLogin };
+    return {
+      email,
+      password,
+      loginUser,
+    };
   },
 };
 </script>
-
-<style scoped>
-.login {
-  max-width: 400px;
-  margin: auto;
-}
-.error {
-  color: red;
-}
-</style>
